@@ -1,0 +1,41 @@
+---
+import ContentLayout from "../layouts/ContentLayout.astro";
+---
+
+<ContentLayout
+  title="Privacidad"
+  description="Qué datos procesa Tu Caja de Herramientas y cuáles no se guardan."
+>
+  <h2>Cálculos</h2>
+  <p>
+    Salario, liquidación, prima, combustible, viaje, crédito y porcentajes se
+    calculan en tu navegador. Esos datos no se envían a un servidor para obtener
+    el resultado y no se guardan en una cuenta, porque no hay cuentas.
+  </p>
+  <h2>Qué no almacenamos</h2>
+  <p>
+    No hay base de datos de usuarios ni historial de cálculos en el servidor. No
+    guardamos salarios, rutas ni montos de crédito.
+  </p>
+  <h2>Analítica</h2>
+  <p>
+    Hay una capa preparada para medir vistas de herramienta, inicios, cálculos
+    exitosos, errores de validación, clics en herramientas relacionadas y
+    búsquedas. En esta versión solo emite un evento dentro de la página. No hay
+    un proveedor externo conectado y no se envían los valores del formulario. Si
+    más adelante se conecta uno, la búsqueda puede incluir el texto que
+    escribiste en el buscador, no los montos de una calculadora.
+  </p>
+  <h2>Publicidad y cookies</h2>
+  <p>
+    Los espacios de publicidad existen en el código y están apagados. No se
+    carga un anuncio ni una cookie de publicidad. Si se encienden, el aviso dirá
+    “Publicidad” y no irá encima del botón de calcular.
+  </p>
+  <h2>Terceros</h2>
+  <p>
+    Las páginas de fuentes enlazan a sitios del Estado y a compilaciones
+    normativas. Entrar a esos enlaces sale de este sitio y queda cubierto por la
+    política de cada entidad.
+  </p>
+</ContentLayout>

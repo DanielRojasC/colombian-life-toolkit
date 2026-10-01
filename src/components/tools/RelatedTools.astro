@@ -1,0 +1,41 @@
+---
+import { getRelatedTools, getToolPath } from "../../config/tools";
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const related = getRelatedTools(slug);
+---
+
+{related.length > 0 && (
+  <section aria-labelledby="related-title">
+    <h2 id="related-title">Herramientas relacionadas</h2>
+    <ul class="related-list">
+      {related.map((tool) => (
+        <li>
+          <a href={getToolPath(tool.slug)} data-related-tool={tool.slug}>
+            {tool.name}
+          </a>
+          <p>{tool.shortDescription}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<script>
+  import { track } from "../../infrastructure/analytics/analytics";
+
+  document
+    .querySelectorAll<HTMLAnchorElement>("[data-related-tool]")
+    .forEach((link) => {
+      link.addEventListener("click", () => {
+        const tool = link.dataset.relatedTool;
+        if (tool) {
+          track("related_tool_click", { tool });
+        }
+      });
+    });
+</script>

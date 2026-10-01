@@ -1,0 +1,110 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("calculadora-liquidacion");
+if (!tool) {
+  throw new Error("Falta la herramienta de liquidación");
+}
+
+const faqs = [
+  {
+    question: "¿Esta liquidación incluye la indemnización?",
+    answer:
+      "No. La indemnización depende del tipo de contrato, de la causa del retiro y del tiempo de servicio. Esta versión no la calcula.",
+  },
+  {
+    question: "¿Qué días debo escribir?",
+    answer:
+      "Los días del periodo que quieres estimar, con un máximo de 360. Un semestre son 180 días. Un año comercial, 360. No promedia cambios de salario de varios años.",
+  },
+  {
+    question: "¿El resultado es lo que me tienen que pagar?",
+    answer:
+      "No. Es una estimación con las fórmulas indicadas. La liquidación real puede incluir otros conceptos y un conteo de días distinto.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <p>Esta calculadora es una estimación y no constituye asesoría legal.</p>
+    <TextField
+      id="ordinarySalary"
+      name="ordinarySalary"
+      label="Salario mensual ordinario"
+      hint="Sin auxilio de transporte."
+    />
+    <TextField
+      id="transportAllowance"
+      name="transportAllowance"
+      label="Auxilio de transporte mensual"
+      hint="Déjalo vacío si no te aplica. Esta herramienta no decide si te corresponde."
+    />
+    <TextField
+      id="daysInPeriod"
+      name="daysInPeriod"
+      label="Días del periodo"
+      hint="Entre 1 y 360. Usa 180 para un semestre y 360 para un año comercial."
+      inputMode="numeric"
+    />
+    <TextField
+      id="unpaidWorkedDays"
+      name="unpaidWorkedDays"
+      label="Días trabajados aún no pagados"
+      hint="Opcional. Entre 0 y 30. Vacío equivale a cero. No incluye auxilio de esos días."
+      inputMode="numeric"
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Qué está calculando</h2>
+    <ul>
+      <li>Cesantías: (salario + auxilio) × días ÷ 360.</li>
+      <li>
+        Intereses de cesantías: cesantías ya redondeadas × 12 % × días ÷ 360.
+      </li>
+      <li>Prima del mismo periodo, con la misma base de cesantías.</li>
+      <li>
+        Vacaciones en dinero: salario × días ÷ 720, sin auxilio. Sale de 15 días
+        por cada 360.
+      </li>
+      <li>Salario de los días pendientes: salario × días ÷ 30.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Qué no está calculando</h2>
+    <ul>
+      <li>Indemnización por despido.</li>
+      <li>Retención en la fuente ni deducciones de préstamos.</li>
+      <li>Salario integral.</li>
+      <li>Prima de vacaciones, bonificaciones o convenciones.</li>
+      <li>Varios años con salarios distintos.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <p>
+      Sirve para un salario ordinario del sector privado y un solo periodo. Tú
+      ingresas la base. Si el salario cambió durante el semestre, promediarlo es
+      parte de lo que debes traer ya resuelto: la herramienta no arma ese
+      promedio.
+    </p>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { settlementView } from "../../components/tools/result-views";
+  import { runSettlement } from "../../application/tools/run-settlement";
+
+  mountCalculator({
+    toolSlug: "calculadora-liquidacion",
+    run: runSettlement,
+    toView: settlementView,
+  });
+</script>

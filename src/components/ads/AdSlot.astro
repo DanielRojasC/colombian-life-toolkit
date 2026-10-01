@@ -1,0 +1,20 @@
+---
+import { adSlotConfig, type AdPlacement } from "../../config/ads";
+
+interface Props {
+  placement: AdPlacement;
+}
+
+const { placement } = Astro.props;
+const slot = adSlotConfig[placement];
+---
+
+{slot.enabled && (
+  <aside
+    class="ad-slot"
+    data-ad-placement={slot.placement}
+    aria-label={slot.label}
+  >
+    <p>Publicidad</p>
+  </aside>
+)}

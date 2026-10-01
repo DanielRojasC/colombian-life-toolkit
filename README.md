@@ -1,43 +1,82 @@
-# Astro Starter Kit: Minimal
+# "Tu Caja de Herramientas para Colombia"
 
-```sh
-npm create astro@latest -- --template minimal
+Sitio estático de calculadoras para decisiones cotidianas en Colombia. Los cálculos corren en el navegador. No hay cuentas, base de datos ni backend.
+
+## Stack
+
+- Astro y TypeScript estricto
+- HTML y CSS
+- JavaScript solo en buscador y calculadoras
+- Vitest para la matemática
+- ESLint y Prettier
+
+## Instalación
+
+```bash
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Desarrollo
 
-## 🚀 Project Structure
+```bash
+npm run dev
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+## Build
+
+Define la URL pública antes de construir. Sirve para los enlaces canónicos, Open Graph y el sitemap.
+
+```bash
+SITE_URL=https://tu-dominio.example npm run build
+npm run preview
+```
+
+Si omites `SITE_URL`, el build usa `http://localhost:4321`.
+
+## Pruebas y verificación
+
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run verify
+```
+
+`verify` ejecuta lint, chequeo de tipos, pruebas y build.
+
+## Arquitectura
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+páginas Astro
+  → application/tools        lee el formulario y valida
+    → domain                  calcula, sin DOM ni red
+      → labor/rules           porcentajes y topes con fuente
+infraestructura
+  → sources                   fichas de normas
+  → analytics                 eventos en el navegador, sin proveedor
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+El texto visible está en español. El código, en inglés.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Convenciones
 
-Any static assets, like images, can be placed in the `public/` directory.
+- Commits: `feat(tools): ...`, `fix(credit): ...`
+- Ramas: `main`, `develop`, `feature/*`, `fix/*`
+- Pesos enteros, redondeo half-up al peso
+- No inventar una regla laboral que no esté en `labor-rules.ts` y en `/fuentes`
 
-## 🧞 Commands
+## Despliegue
 
-All commands are run from the root of the project, from a terminal:
+El build de `dist/` se puede publicar en Cloudflare Pages, Netlify, Vercel u otro hosting estático. No depende de un proveedor.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Variables
 
-## 👀 Want to learn more?
+| Variable   | Uso                                                  |
+| ---------- | ---------------------------------------------------- |
+| `SITE_URL` | Origen público en tiempo de build. No es un secreto. |
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+No hay variables `PUBLIC_` con llaves. La analítica no llama a un tercero. Los espacios de anuncio están apagados en `src/config/ads.ts`.
+
+## Decisiones
+
+Ver `docs/adr/`.

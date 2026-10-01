@@ -1,0 +1,90 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("calculadora-prima");
+if (!tool) {
+  throw new Error("Falta la herramienta de prima");
+}
+
+const faqs = [
+  {
+    question: "¿Cuánto es la prima de un semestre completo?",
+    answer:
+      "Con 180 días, la prima estimada es la mitad del salario más el auxilio de transporte que ingreses.",
+  },
+  {
+    question: "¿El auxilio de transporte entra en la prima?",
+    answer:
+      "En esta estimación, sí, si escribes el valor. Si no te pagan auxilio, deja el campo vacío. La herramienta no consulta el tope de dos salarios mínimos.",
+  },
+  {
+    question: "¿Sirve para el sector público?",
+    answer:
+      "No está hecha para eso. El artículo 306 del Código Sustantivo del Trabajo regula la prima del sector privado, con el texto modificado por la Ley 1788 de 2016.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <TextField
+      id="ordinarySalary"
+      name="ordinarySalary"
+      label="Salario mensual del periodo"
+      hint="Si tuviste comisiones o recargos variables, ingresa el promedio mensual que quieras usar. La herramienta no calcula ese promedio."
+    />
+    <TextField
+      id="transportAllowance"
+      name="transportAllowance"
+      label="Auxilio de transporte mensual"
+      hint="Vacío significa cero."
+    />
+    <TextField
+      id="daysWorked"
+      name="daysWorked"
+      label="Días trabajados"
+      hint="Entre 1 y 360."
+      inputMode="numeric"
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <p>
+      El artículo 306 reconoce 30 días de salario por año, pagados por semestre
+      o en proporción a los días trabajados.
+    </p>
+    <p>Fórmula: prima = (salario + auxilio de transporte) × días ÷ 360.</p>
+    <p>
+      Ejemplo: salario $1.800.000, sin auxilio y 180 días. Prima estimada:
+      $900.000.
+    </p>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <ul>
+      <li>Año comercial de 360 días.</li>
+      <li>
+        La base ya incluye lo que tú decides tratar como salario del periodo.
+      </li>
+      <li>No descuenta retención ni anticipos de prima.</li>
+    </ul>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { primaView } from "../../components/tools/result-views";
+  import { runPrima } from "../../application/tools/run-prima";
+
+  mountCalculator({
+    toolSlug: "calculadora-prima",
+    run: runPrima,
+    toView: primaView,
+  });
+</script>

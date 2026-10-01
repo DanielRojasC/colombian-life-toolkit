@@ -1,0 +1,85 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import AdSlot from "../components/ads/AdSlot.astro";
+import Breadcrumbs from "../components/navigation/Breadcrumbs.astro";
+import RelatedTools from "../components/tools/RelatedTools.astro";
+import ToolSources from "../components/tools/ToolSources.astro";
+import { getCategory } from "../config/categories";
+import { getCategoryPath, type ToolDefinition } from "../config/tools";
+import { siteConfig } from "../config/site";
+import { getSources } from "../infrastructure/sources/official-sources";
+import { formatIsoDate } from "../utils/format";
+
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  tool: ToolDefinition;
+  faqs?: Faq[];
+}
+
+const { tool, faqs = [] } = Astro.props;
+const category = getCategory(tool.category);
+const crumbs = [
+  { name: "Inicio", href: "/" },
+  { name: category.name, href: getCategoryPath(tool.category) },
+  { name: tool.name, href: `/herramientas/${tool.slug}` },
+];
+---
+
+<BaseLayout
+  title={tool.seo.title}
+  description={tool.seo.description}
+  breadcrumbs={crumbs}
+  faqs={faqs}
+>
+  <article class="shell tool-layout">
+    <Breadcrumbs items={crumbs} />
+    <header>
+      <p class="eyebrow">{category.name}</p>
+      <h1>{tool.name}</h1>
+      <p class="lede">{tool.shortDescription}</p>
+      <p class="meta">
+        Última actualización:{" "}
+        <time datetime={tool.updatedAt}>{formatIsoDate(tool.updatedAt)}</time>
+      </p>
+    </header>
+    <AdSlot placement="content-top" />
+    <div class="tool-workbench">
+      <section class="tool-form" aria-labelledby="form-title">
+        <h2 id="form-title">Tus datos</h2>
+        <noscript>
+          <p class="alert">
+            Para calcular en esta página necesitas JavaScript. La explicación y
+            las fuentes se pueden leer igual.
+          </p>
+        </noscript>
+        <slot name="form" />
+      </section>
+      <section
+        tabindex="-1"
+        data-result
+        aria-live="polite"
+        aria-atomic="true"
+      ></section>
+    </div>
+    <AdSlot placement="tool-result-bottom" />
+    <slot />
+    {faqs.length > 0 && (
+      <section aria-labelledby="faq-title">
+        <h2 id="faq-title">Preguntas frecuentes</h2>
+        {faqs.map((faq) => (
+          <details class="faq">
+            <summary>{faq.question}</summary>
+            <p>{faq.answer}</p>
+          </details>
+        ))}
+      </section>
+    )}
+    <ToolSources sources={getSources(tool.sourceIds)} />
+    <RelatedTools slug={tool.slug} />
+    <p class="notice">{siteConfig.disclaimer}</p>
+  </article>
+</BaseLayout>

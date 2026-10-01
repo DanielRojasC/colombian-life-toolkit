@@ -1,0 +1,32 @@
+---
+interface Option {
+  value: string;
+  label: string;
+  hint?: string;
+}
+
+interface Props {
+  name: string;
+  legend: string;
+  options: Option[];
+  value?: string;
+}
+
+const { name, legend, options, value } = Astro.props;
+---
+
+<fieldset class="choice">
+  <legend>{legend}</legend>
+  {options.map((option) => (
+    <label>
+      <input
+        type="radio"
+        name={name}
+        value={option.value}
+        checked={option.value === value}
+      />
+      <span>{option.label}</span>
+    </label>
+  ))}
+  <p class="field-error" data-error-for={name} hidden></p>
+</fieldset>

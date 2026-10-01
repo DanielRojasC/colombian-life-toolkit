@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/navigation/Breadcrumbs.astro";
+import Icon from "../../components/ui/Icon.astro";
+import { getCategoryBySlug } from "../../config/categories";
+import {
+  getCategoriesWithActiveTools,
+  getCategoryPath,
+  getToolPath,
+  getToolsByCategory,
+} from "../../config/tools";
+
+export function getStaticPaths() {
+  return getCategoriesWithActiveTools().map((category) => ({
+    params: { slug: category.slug },
+  }));
+}
+
+const category = getCategoryBySlug(Astro.params.slug ?? "");
+if (!category) {
+  throw new Error("Categoría desconocida");
+}
+
+const tools = getToolsByCategory(category.id);
+const crumbs = [
+  { name: "Inicio", href: "/" },
+  { name: category.name, href: getCategoryPath(category.id) },
+];
+
+const notes: Record<string, string[]> = {
+  trabajo: [
+    "Estas estimaciones sirven para un salario ordinario del sector privado. No reemplazan la liquidación de tu empleador ni aplican, sin más, al sector público o al salario integral.",
+    "Salud y pensión usan los porcentajes a cargo del trabajador que citan las normas de la herramienta. La retención en la fuente no está incluida: depende del procedimiento y de datos que esta versión no pide.",
+  ],
+  dinero: [
+    "La calculadora de crédito no trae una tasa de ningún banco. Tú eliges si el número que tienes es efectivo anual, nominal mensual o nominal anual mes vencido.",
+    "No suma seguros, fianza ni comisiones. Si la cuota de tu extracto es distinta, casi siempre falta uno de esos cobros o el tipo de tasa no coincide.",
+  ],
+  vehiculos: [
+    "No consultamos mapas ni peajes. La distancia y el precio los escribes tú, para que el resultado no dependa de un servicio externo.",
+    "Si mezclas precio por galón con consumo por litro, convertimos con el galón líquido de Estados Unidos, que es el galón de la gasolina en Colombia: 3,785411784 litros.",
+  ],
+  vivienda: [
+    "Todavía no hay una calculadora de arriendo o de comprar frente a arrendar. Inventar un porcentaje de ingreso “recomendado” sería presentar una regla que no está verificada.",
+    "Mientras tanto puedes estimar la cuota de un crédito y calcular qué parte de un ingreso representa un canon, con la calculadora de porcentajes.",
+  ],
+  freelancers: [
+    "Todavía no hay calculadora de tarifa por hora ni de cotización. La base de aportes de una persona independiente tiene reglas propias y no las vamos a resumir sin verificarlas en la norma vigente.",
+    "Puedes usar porcentajes para un descuento o un margen, y la calculadora de crédito si vas a financiar una compra.",
+  ],
+  "vida-cotidiana": [
+    "La calculadora de porcentajes no asume IVA ni otra tarifa. El 19 % solo aparece si tú lo escribes.",
+    "Sirve para una rebaja, un aumento o para saber qué porcentaje es un valor de otro.",
+  ],
+};
+---
+
+<BaseLayout
+  title={category.name}
+  description={category.description}
+  breadcrumbs={crumbs}
+>
+  <div class="shell">
+    <Breadcrumbs items={crumbs} />
+    <p class="icon-badge">
+      <Icon name={category.icon} />
+    </p>
+    <h1>{category.name}</h1>
+    <p class="lede">{category.description}</p>
+    {notes[category.id]?.map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+    {tools.length > 0 ? (
+      <div class="card-grid section">
+        {tools.map((tool) => (
+          <a class="tool-card" href={getToolPath(tool.slug)}>
+            <h2>{tool.name}</h2>
+            <p>{tool.shortDescription}</p>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="notice">
+        No hay herramientas activas en esta categoría. Las que existen están en
+        el listado general.
+      </p>
+    )}
+    {tools.length === 0 && (
+      <p>
+        <a href="/herramientas">Ver herramientas disponibles</a>
+      </p>
+    )}
+  </div>
+</BaseLayout>

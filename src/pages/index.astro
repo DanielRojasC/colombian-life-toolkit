@@ -1,17 +1,127 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/ui/Icon.astro";
+import SearchBox from "../components/navigation/SearchBox.astro";
+import {
+  getActiveTools,
+  getCategoriesWithActiveTools,
+  getCategoryPath,
+  getToolPath,
+} from "../config/tools";
+import { siteConfig } from "../config/site";
 
+const tools = getActiveTools();
+const categories = getCategoriesWithActiveTools();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title={siteConfig.name}
+  description={siteConfig.description}
+  website
+>
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Gratuita y sin cuenta</p>
+        <h1>Tu caja de herramientas para Colombia</h1>
+        <p class="lede">
+          Herramientas gratuitas para calcular, comparar y tomar decisiones
+          sobre dinero, trabajo, vehículos y vida cotidiana.
+        </p>
+      </div>
+      <SearchBox />
+    </section>
+
+    <section class="section" aria-labelledby="categorias-titulo">
+      <h2 id="categorias-titulo">Categorías</h2>
+      <div class="category-grid">
+        {categories.map((category) => (
+          <a class="category-card" href={getCategoryPath(category.id)}>
+            <span class="icon-badge">
+              <Icon name={category.icon} />
+            </span>
+            <h3>{category.name}</h3>
+            <p>{category.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="populares-titulo">
+      <h2 id="populares-titulo">Herramientas populares</h2>
+      <div class="card-grid">
+        {tools.map((tool) => (
+          <a class="tool-card" href={getToolPath(tool.slug)}>
+            <h3>{tool.name}</h3>
+            <p>{tool.shortDescription}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="como-titulo">
+      <h2 id="como-titulo">Cómo funciona</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-index">1</span>
+          <div>
+            <h3>Elige una herramienta</h3>
+            <p>Busca por nombre o entra por la categoría del problema.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-index">2</span>
+          <div>
+            <h3>Ingresa tus datos</h3>
+            <p>
+              El cálculo ocurre en tu navegador. No tienes que crear una cuenta.
+            </p>
+          </div>
+        </li>
+        <li>
+          <span class="step-index">3</span>
+          <div>
+            <h3>Obtén tu resultado</h3>
+            <p>
+              Ves la estimación, el desglose, la fórmula y las fuentes cuando
+              existen.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section" aria-labelledby="confianza-titulo">
+      <h2 id="confianza-titulo">Por qué puedes revisar el cálculo</h2>
+      <ul class="trust-list">
+        <li class="card">
+          <h3>Fuentes</h3>
+          <p>
+            Las reglas laborales citan la norma. Si un dato no está verificado,
+            la herramienta no lo inventa.
+          </p>
+        </li>
+        <li class="card">
+          <h3>Fecha de actualización</h3>
+          <p>
+            Cada herramienta muestra cuándo se revisaron sus reglas o su método.
+          </p>
+        </li>
+        <li class="card">
+          <h3>Metodología</h3>
+          <p>
+            La fórmula queda escrita. El resultado es una estimación, no una
+            liquidación oficial.
+          </p>
+        </li>
+        <li class="card">
+          <h3>Privacidad</h3>
+          <p>
+            Salario, crédito y recorridos no se envían a un servidor para poder
+            calcularlos.
+          </p>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

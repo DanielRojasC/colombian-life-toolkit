@@ -1,0 +1,79 @@
+---
+interface Props {
+  query?: string;
+}
+
+const { query = "" } = Astro.props;
+---
+
+<form class="search-form" role="search" action="/herramientas" method="get">
+  <label for="tool-search">¿Qué necesitas calcular?</label>
+  <input
+    id="tool-search"
+    name="q"
+    type="search"
+    placeholder="Buscar una herramienta..."
+    value={query}
+    autocomplete="off"
+  />
+  <ul id="tool-suggestions" class="suggestions" hidden></ul>
+  <button class="btn" type="submit">
+    Buscar
+  </button>
+</form>
+
+<script>
+  import { getActiveTools, getToolPath } from "../../config/tools";
+  import { matchesSearch } from "../../domain/common/search";
+  import { getCategory } from "../../config/categories";
+  import { track } from "../../infrastructure/analytics/analytics";
+
+  const input = document.querySelector<HTMLInputElement>("#tool-search");
+  const list = document.querySelector<HTMLUListElement>("#tool-suggestions");
+  const tools = getActiveTools();
+
+  if (input && list) {
+    const render = (query: string): void => {
+      const normalized = query.trim();
+      list.replaceChildren();
+      if (normalized.length < 2) {
+        list.hidden = true;
+        return;
+      }
+
+      const matches = tools.filter((tool) =>
+        matchesSearch(normalized, [
+          tool.name,
+          tool.shortDescription,
+          getCategory(tool.category).name,
+          ...tool.keywords,
+        ]),
+      );
+      matches.forEach((tool) => {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = getToolPath(tool.slug);
+        link.textContent = tool.name;
+        item.append(link);
+        list.append(item);
+      });
+      if (matches.length === 0) {
+        const item = document.createElement("li");
+        item.textContent = "No hay una herramienta con esas palabras.";
+        list.append(item);
+      }
+      list.hidden = false;
+    };
+
+    input.addEventListener("input", () => {
+      render(input.value);
+    });
+
+    input.form?.addEventListener("submit", () => {
+      const query = input.value.trim();
+      if (query.length >= 2) {
+        track("search", { query });
+      }
+    });
+  }
+</script>

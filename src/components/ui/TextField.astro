@@ -1,0 +1,45 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  hint?: string;
+  inputMode?: "decimal" | "numeric" | "text";
+  value?: string;
+  autocomplete?: string;
+  modes?: string;
+}
+
+const {
+  id,
+  name,
+  label,
+  hint,
+  inputMode = "decimal",
+  value,
+  autocomplete = "off",
+  modes,
+} = Astro.props;
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class="field" data-modes={modes}>
+  <label for={id}>{label}</label>
+  <input
+    id={id}
+    name={name}
+    type="text"
+    inputmode={inputMode}
+    value={value}
+    autocomplete={autocomplete}
+    aria-describedby={describedBy}
+  />
+  {hint && (
+    <p id={`${id}-hint`} class="field-hint">
+      {hint}
+    </p>
+  )}
+  <p id={`${id}-error`} class="field-error" data-error-for={name} hidden></p>
+</div>

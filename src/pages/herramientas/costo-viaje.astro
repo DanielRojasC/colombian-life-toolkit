@@ -1,0 +1,133 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import RadioGroup from "../../components/ui/RadioGroup.astro";
+import SelectField from "../../components/ui/SelectField.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("costo-viaje");
+if (!tool) {
+  throw new Error("Falta la herramienta de viaje");
+}
+
+const faqs = [
+  {
+    question: "¿Puedo escribir la ciudad de origen y la de destino?",
+    answer:
+      "Sí, pero solo para nombrar el resultado. La distancia la ingresas tú. Esta versión no consulta mapas ni rutas.",
+  },
+  {
+    question: "¿Qué hago si los peajes de regreso son distintos?",
+    answer:
+      "Suma los peajes de ida y de regreso, escribe esa suma y elige solo ida. Ida y vuelta duplica el peaje escrito.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <TextField
+      id="origin"
+      name="origin"
+      label="Origen"
+      hint="Opcional. No cambia el cálculo."
+      inputMode="text"
+      autocomplete="off"
+    />
+    <TextField
+      id="destination"
+      name="destination"
+      label="Destino"
+      hint="Opcional. No cambia el cálculo."
+      inputMode="text"
+      autocomplete="off"
+    />
+    <TextField
+      id="distanceKm"
+      name="distanceKm"
+      label="Distancia de ida (km)"
+    />
+    <TextField
+      id="consumption"
+      name="consumption"
+      label="Consumo del vehículo"
+    />
+    <SelectField
+      id="consumptionUnit"
+      name="consumptionUnit"
+      label="Unidad del consumo"
+      value="km-per-gallon"
+      options={[
+        { value: "km-per-gallon", label: "Kilómetros por galón" },
+        { value: "km-per-liter", label: "Kilómetros por litro" },
+      ]}
+    />
+    <TextField id="price" name="price" label="Precio del combustible" />
+    <SelectField
+      id="priceUnit"
+      name="priceUnit"
+      label="Unidad del precio"
+      value="cop-per-gallon"
+      options={[
+        { value: "cop-per-gallon", label: "Pesos por galón" },
+        { value: "cop-per-liter", label: "Pesos por litro" },
+      ]}
+    />
+    <TextField
+      id="tolls"
+      name="tolls"
+      label="Peajes de ida"
+      hint="Vacío equivale a cero. En ida y vuelta este valor se duplica."
+    />
+    <TextField
+      id="passengers"
+      name="passengers"
+      label="Pasajeros"
+      value="1"
+      inputMode="numeric"
+    />
+    <RadioGroup
+      name="direction"
+      legend="Recorrido"
+      value="one-way"
+      options={[
+        { value: "one-way", label: "Solo ida" },
+        { value: "round-trip", label: "Ida y vuelta" },
+      ]}
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <p>Combustible = distancia considerada ÷ rendimiento × precio.</p>
+    <p>
+      Total = combustible + peajes. El costo por pasajero divide ese total. El
+      costo por kilómetro lo divide entre la distancia considerada.
+    </p>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <ul>
+      <li>No hay tráfico, desvíos ni precio distinto de regreso.</li>
+      <li>Ida y vuelta duplica distancia y peajes.</li>
+      <li>
+        Más adelante se puede conectar un mapa. Hoy el cálculo no lo necesita.
+      </li>
+    </ul>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { tripView } from "../../components/tools/result-views";
+  import { runTripCost } from "../../application/tools/run-trip-cost";
+
+  mountCalculator({
+    toolSlug: "costo-viaje",
+    run: runTripCost,
+    toView: tripView,
+  });
+</script>

@@ -1,0 +1,53 @@
+---
+import { getCategoriesWithActiveTools } from "../../config/tools";
+import { siteConfig } from "../../config/site";
+import Icon from "../ui/Icon.astro";
+
+const current = Astro.url.pathname;
+const categories = getCategoriesWithActiveTools();
+---
+
+<header class="site-header">
+  <div class="shell site-header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">
+        <Icon name="mark" />
+      </span>
+      <span>
+        <span class="brand-name">{siteConfig.shortName}</span>
+        <span class="brand-tag">para Colombia</span>
+      </span>
+    </a>
+    <input id="nav-toggle" class="nav-toggle-input" type="checkbox" />
+    <label class="nav-toggle" for="nav-toggle">
+      Menú
+    </label>
+    <nav class="site-nav" aria-label="Principal">
+      <ul>
+        <li>
+          <a
+            href="/herramientas"
+            aria-current={
+              current.startsWith("/herramientas") ? "page" : undefined
+            }
+          >
+            Herramientas
+          </a>
+        </li>
+        {categories.map((category) => {
+          const href = `/categorias/${category.slug}`;
+          return (
+            <li>
+              <a
+                href={href}
+                aria-current={current === href ? "page" : undefined}
+              >
+                {category.name}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
+</header>

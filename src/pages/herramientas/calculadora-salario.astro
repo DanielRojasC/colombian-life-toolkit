@@ -1,0 +1,99 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("calculadora-salario");
+if (!tool) {
+  throw new Error("Falta la herramienta de salario");
+}
+
+const faqs = [
+  {
+    question: "¿Este valor es el salario que llega al banco?",
+    answer:
+      "Es una estimación después de salud, pensión y fondo de solidaridad. No resta retención en la fuente, libranzas, embargos ni otros descuentos de nómina.",
+  },
+  {
+    question: "¿Debo incluir el auxilio de transporte?",
+    answer:
+      "No. El auxilio de transporte no hace parte de la base de salud y pensión que usa esta calculadora. Escríbelo solo en las herramientas de prima y liquidación.",
+  },
+  {
+    question: "¿Qué pasa si gano más de 25 salarios mínimos?",
+    answer:
+      "La cotización se estima sobre el tope de 25 salarios mínimos de la Ley 797 de 2003. El resultado lo indica cuando aplica ese tope.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <TextField
+      id="grossMonthly"
+      name="grossMonthly"
+      label="Salario mensual antes de descuentos"
+      hint="Usa el ingreso sobre el que te calculan salud y pensión. Incluye comisiones u horas extra habituales si hacen parte de esa base."
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <p>
+      Al ingreso base se le aplica 4 % de salud y 4 % de pensión, que es la
+      parte del trabajador. Si la base es de al menos 4 salarios mínimos, se
+      suma el Fondo de Solidaridad Pensional: 1 % desde ese punto y un adicional
+      progresivo desde 16 salarios mínimos, hasta 2 % por encima de 20.
+    </p>
+    <p>Fórmula: estimado = salario − salud − pensión − fondo de solidaridad.</p>
+    <p>
+      Ejemplo con el salario mínimo de 2026, $1.750.905: salud $70.036, pensión
+      $70.036, fondo $0. Estimado: $1.610.833. El 4 % de $1.750.905 da
+      $70.036,20 y aquí se redondea al peso más cercano.
+    </p>
+  </section>
+  <section>
+    <h2>Qué no calcula</h2>
+    <ul>
+      <li>Retención en la fuente.</li>
+      <li>Aportes del empleador.</li>
+      <li>
+        Salario integral, ni el 70 % que la ley usa como base en ese caso.
+      </li>
+      <li>
+        El tope ampliado que el Gobierno puede reglamentar por encima de 25
+        salarios mínimos.
+      </li>
+      <li>Novedades de nómina, incapacidades ni varios empleadores.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <ul>
+      <li>Trabajador dependiente del régimen contributivo.</li>
+      <li>
+        El salario escrito es el ingreso base, sin reclasificar pagos no
+        salariales.
+      </li>
+      <li>
+        Los brackets “de 16 a 17” se leen como desde 16 y antes de 17. En 20
+        salarios mínimos exactos la tasa usada es 1,8 %; por encima de 20, 2 %.
+      </li>
+    </ul>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { netSalaryView } from "../../components/tools/result-views";
+  import { runNetSalary } from "../../application/tools/run-net-salary";
+
+  mountCalculator({
+    toolSlug: "calculadora-salario",
+    run: runNetSalary,
+    toView: netSalaryView,
+  });
+</script>

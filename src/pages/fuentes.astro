@@ -1,0 +1,24 @@
+---
+import ContentLayout from "../layouts/ContentLayout.astro";
+import { officialSources } from "../infrastructure/sources/official-sources";
+---
+
+<ContentLayout
+  title="Fuentes"
+  description="Normas y compilaciones oficiales usadas por las calculadoras laborales."
+>
+  <p>
+    Estas son las fuentes citadas por las herramientas. Los cálculos de
+    combustible, viaje, crédito y porcentajes no dependen de una tarifa oficial.
+  </p>
+  <ul class="source-list">
+    {officialSources.map((source) => (
+      <li>
+        <a href={source.url}>{source.title}</a>
+        <p>
+          {source.publisher}. {source.note}
+        </p>
+      </li>
+    ))}
+  </ul>
+</ContentLayout>

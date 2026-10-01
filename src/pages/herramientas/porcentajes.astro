@@ -1,0 +1,106 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import RadioGroup from "../../components/ui/RadioGroup.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("porcentajes");
+if (!tool) {
+  throw new Error("Falta la herramienta de porcentajes");
+}
+
+const faqs = [
+  {
+    question: "¿Cuánto es el 20 % de 500.000?",
+    answer: "100.000. Elige “Porcentaje de un valor”, escribe 500.000 y 20.",
+  },
+  {
+    question: "¿Cómo calculo un descuento?",
+    answer:
+      "Elige descuento, escribe el precio y el porcentaje. Un 10 % sobre 200.000 deja 180.000.",
+  },
+  {
+    question: "¿Esto calcula el IVA solo?",
+    answer:
+      "No aplica una tarifa por defecto. Si quieres el 19 %, escríbelo como porcentaje de un valor o como incremento.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator data-live="true" novalidate>
+    <FormError />
+    <RadioGroup
+      name="mode"
+      legend="Qué quieres calcular"
+      value="part"
+      options={[
+        { value: "part", label: "Porcentaje de un valor" },
+        { value: "increase", label: "Incremento" },
+        { value: "discount", label: "Descuento" },
+        { value: "difference", label: "Diferencia entre dos valores" },
+        { value: "ratio", label: "Qué porcentaje es un valor de otro" },
+      ]}
+    />
+    <TextField
+      id="base"
+      name="base"
+      label="Valor"
+      modes="part increase discount"
+    />
+    <TextField
+      id="percent"
+      name="percent"
+      label="Porcentaje"
+      modes="part increase discount"
+    />
+    <TextField
+      id="initial"
+      name="initial"
+      label="Primer valor"
+      hint="En la diferencia, es el valor inicial."
+      modes="difference ratio"
+    />
+    <TextField
+      id="final"
+      name="final"
+      label="Segundo valor"
+      hint="En la diferencia, es el valor final. En el porcentaje entre dos, es el total."
+      modes="difference ratio"
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <ul>
+      <li>Porcentaje de un valor: valor × porcentaje ÷ 100.</li>
+      <li>Incremento: valor × (1 + porcentaje ÷ 100).</li>
+      <li>Descuento: valor × (1 − porcentaje ÷ 100).</li>
+      <li>Diferencia: (final − inicial) ÷ inicial × 100.</li>
+      <li>Porcentaje entre dos valores: primer valor ÷ segundo valor × 100.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <p>
+      Los números quedan en la misma unidad en la que los escribes. Un descuento
+      no puede pasar de 100 %. La diferencia sí puede ser negativa si el valor
+      final es menor.
+    </p>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { percentageView } from "../../components/tools/result-views";
+  import { runPercentage } from "../../application/tools/run-percentage";
+
+  mountCalculator({
+    toolSlug: "porcentajes",
+    run: runPercentage,
+    toView: percentageView,
+    live: true,
+  });
+</script>

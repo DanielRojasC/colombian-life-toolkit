@@ -1,0 +1,127 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import SelectField from "../../components/ui/SelectField.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("calculadora-combustible");
+if (!tool) {
+  throw new Error("Falta la herramienta de combustible");
+}
+
+const faqs = [
+  {
+    question: "¿Cómo calculo la gasolina de un viaje?",
+    answer:
+      "Divide la distancia entre el rendimiento y multiplica por el precio. Si el carro rinde 40 km por galón, 100 km cuestan 2,5 galones.",
+  },
+  {
+    question: "¿Qué precio debo usar?",
+    answer:
+      "El de la estación, por galón o por litro. Esta herramienta no trae un precio de referencia.",
+  },
+  {
+    question: "¿El costo por persona divide también los peajes?",
+    answer:
+      "Aquí no hay peajes. Para sumarlos usa la calculadora de costo de viaje.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <TextField
+      id="distanceKm"
+      name="distanceKm"
+      label="Distancia de un recorrido (km)"
+      hint="Puede ser cero. No uses un valor de ejemplo si no es tu ruta."
+    />
+    <TextField
+      id="consumption"
+      name="consumption"
+      label="Consumo del vehículo"
+      hint="Kilómetros que recorre con un galón o con un litro, según la unidad."
+    />
+    <SelectField
+      id="consumptionUnit"
+      name="consumptionUnit"
+      label="Unidad del consumo"
+      value="km-per-gallon"
+      options={[
+        { value: "km-per-gallon", label: "Kilómetros por galón" },
+        { value: "km-per-liter", label: "Kilómetros por litro" },
+      ]}
+    />
+    <TextField id="price" name="price" label="Precio del combustible" />
+    <SelectField
+      id="priceUnit"
+      name="priceUnit"
+      label="Unidad del precio"
+      value="cop-per-gallon"
+      options={[
+        { value: "cop-per-gallon", label: "Pesos por galón" },
+        { value: "cop-per-liter", label: "Pesos por litro" },
+      ]}
+    />
+    <TextField
+      id="trips"
+      name="trips"
+      label="Número de viajes"
+      value="1"
+      hint="Multiplica este cálculo. No es la estimación mensual."
+      inputMode="numeric"
+    />
+    <TextField
+      id="passengers"
+      name="passengers"
+      label="Pasajeros"
+      value="1"
+      inputMode="numeric"
+    />
+    <TextField
+      id="tripsPerMonth"
+      name="tripsPerMonth"
+      label="Viajes al mes de un solo recorrido"
+      hint="Opcional. Si lo llenas, la estimación mensual usa un recorrido, no los viajes de arriba."
+      inputMode="numeric"
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <p>Costo = distancia ÷ rendimiento × precio × viajes.</p>
+    <p>
+      Ejemplo: 100 km, 40 km por galón, $16.000 el galón y un viaje. Son 2,5
+      galones y $40.000. Por persona, si viaja una, $40.000. Por kilómetro,
+      $400.
+    </p>
+    <p>
+      Si el precio y el consumo no usan la misma unidad, convertimos con el
+      galón líquido de Estados Unidos: 3,785411784 litros. Si ambos están en
+      galones o ambos en litros, no hay conversión.
+    </p>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <ul>
+      <li>El rendimiento es constante.</li>
+      <li>No incluye peajes, parqueadero ni desgaste.</li>
+      <li>El dinero se muestra redondeado al peso.</li>
+    </ul>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { fuelView } from "../../components/tools/result-views";
+  import { runFuelCost } from "../../application/tools/run-fuel-cost";
+
+  mountCalculator({
+    toolSlug: "calculadora-combustible",
+    run: runFuelCost,
+    toView: fuelView,
+  });
+</script>

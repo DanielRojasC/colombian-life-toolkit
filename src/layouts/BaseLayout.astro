@@ -1,0 +1,119 @@
+---
+import "../styles/global.css";
+import { siteConfig } from "../config/site";
+import { createSeoMetadata } from "../utils/seo";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+
+interface Crumb {
+  name: string;
+  href: string;
+}
+
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  robots?: string;
+  breadcrumbs?: Crumb[];
+  faqs?: Faq[];
+  website?: boolean;
+}
+
+const {
+  title,
+  description,
+  robots,
+  breadcrumbs = [],
+  faqs = [],
+  website = false,
+} = Astro.props;
+const seo = createSeoMetadata({
+  title,
+  description,
+  pathname: Astro.url.pathname,
+});
+const graph = [
+  website
+    ? {
+        "@type": "WebSite",
+        name: siteConfig.name,
+        url: siteConfig.siteUrl,
+        inLanguage: siteConfig.locale,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteConfig.siteUrl}/herramientas?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      }
+    : null,
+  breadcrumbs.length > 0
+    ? {
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbs.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: new URL(crumb.href, siteConfig.siteUrl).href,
+        })),
+      }
+    : null,
+  faqs.length > 0
+    ? {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: { "@type": "Answer", text: faq.answer },
+        })),
+      }
+    : null,
+].filter((item) => item !== null);
+---
+
+<html lang={siteConfig.language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <link rel="canonical" href={seo.canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0f6e62" />
+    {robots && <meta name="robots" content={robots} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={seo.ogLocale} />
+    <meta property="og:site_name" content={seo.siteName} />
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:url" content={seo.canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={seo.title} />
+    <meta name="twitter:description" content={seo.description} />
+    {graph.length > 0 && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": graph,
+        })}
+      />
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">
+      Saltar al contenido
+    </a>
+    <SiteHeader />
+    <main id="contenido">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

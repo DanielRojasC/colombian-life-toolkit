@@ -1,0 +1,102 @@
+---
+import ToolLayout from "../../layouts/ToolLayout.astro";
+import FormActions from "../../components/tools/FormActions.astro";
+import FormError from "../../components/tools/FormError.astro";
+import SelectField from "../../components/ui/SelectField.astro";
+import TextField from "../../components/ui/TextField.astro";
+import { getTool } from "../../config/tools";
+
+const tool = getTool("calculadora-credito");
+if (!tool) {
+  throw new Error("Falta la herramienta de crédito");
+}
+
+const faqs = [
+  {
+    question: "¿Qué tasa debo elegir?",
+    answer:
+      "Si el banco dice tasa efectiva anual, elige esa. Si el número ya es el interés de cada mes, elige nominal mensual. Si dice nominal anual mes vencido, elige esa: se divide entre 12 y no se convierte a efectiva.",
+  },
+  {
+    question: "¿Por qué la última cuota puede ser distinta?",
+    answer:
+      "Porque cada interés se redondea al peso y la última cuota deja el saldo en cero.",
+  },
+  {
+    question: "¿Incluye el seguro del crédito?",
+    answer:
+      "No. Tampoco incluye comisiones ni fianza. La cuota de un extracto puede ser más alta por eso.",
+  },
+];
+---
+
+<ToolLayout tool={tool} faqs={faqs}>
+  <form slot="form" data-calculator novalidate>
+    <FormError />
+    <TextField id="principal" name="principal" label="Monto del crédito" />
+    <TextField
+      id="ratePercent"
+      name="ratePercent"
+      label="Tasa (%)"
+      hint="Escribe 1,5 para 1,5 %. No la conviertas tú a decimal."
+    />
+    <SelectField
+      id="rateKind"
+      name="rateKind"
+      label="Tipo de tasa"
+      value="effective-annual"
+      hint="La cuota de esta versión siempre es mensual. El tipo de tasa dice cómo leer el porcentaje."
+      options={[
+        { value: "effective-annual", label: "Efectiva anual" },
+        { value: "nominal-monthly", label: "Nominal mensual" },
+        { value: "nominal-annual-monthly", label: "Nominal anual mes vencido" },
+      ]}
+    />
+    <TextField
+      id="termMonths"
+      name="termMonths"
+      label="Plazo en meses"
+      inputMode="numeric"
+      hint="Entre 1 y 600."
+    />
+    <FormActions />
+  </form>
+  <section>
+    <h2>Cómo se calcula</h2>
+    <p>
+      La cuota fija es monto × i × (1 + i) ^ n ÷ ((1 + i) ^ n − 1), donde i es
+      la tasa de un mes y n el número de meses.
+    </p>
+    <p>
+      Si la tasa es efectiva anual, i = (1 + tasa) ^ (1/12) − 1. Si es nominal
+      mensual, i es la tasa escrita. Si es nominal anual mes vencido, i es la
+      tasa escrita dividida entre 12.
+    </p>
+    <p>
+      Con tasa 0 %, la cuota es el monto dividido entre los meses, sin
+      intereses.
+    </p>
+  </section>
+  <section>
+    <h2>Supuestos</h2>
+    <ul>
+      <li>Cuota fija y abonos cada mes.</li>
+      <li>No hay abono extraordinario ni periodo de gracia.</li>
+      <li>
+        El redondeo al peso ocurre en cada interés y en la cuota de referencia.
+      </li>
+    </ul>
+  </section>
+</ToolLayout>
+
+<script>
+  import { mountCalculator } from "../../components/tools/mount-calculator";
+  import { creditView } from "../../components/tools/result-views";
+  import { runCredit } from "../../application/tools/run-credit";
+
+  mountCalculator({
+    toolSlug: "calculadora-credito",
+    run: runCredit,
+    toView: creditView,
+  });
+</script>

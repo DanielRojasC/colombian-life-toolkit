@@ -1,0 +1,25 @@
+---
+import Breadcrumbs from "../components/navigation/Breadcrumbs.astro";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const crumbs = [
+  { name: "Inicio", href: "/" },
+  { name: title, href: Astro.url.pathname },
+];
+---
+
+<BaseLayout title={title} description={description} breadcrumbs={crumbs}>
+  <article class="shell">
+    <Breadcrumbs items={crumbs} />
+    <div class="content-block">
+      <h1>{title}</h1>
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,43 @@
+:root {
+  --color-primary: #0f6e62;
+  --color-primary-hover: #0b574e;
+  --color-primary-soft: #e5f6f2;
+  --color-accent: #9a3412;
+  --color-background: #f4f7f6;
+  --color-surface: #ffffff;
+  --color-text: #12211e;
+  --color-text-muted: #3e524c;
+  --color-border: #d5e3de;
+  --color-danger: #9f2d2d;
+  --color-danger-soft: #fdecec;
+  --color-result: #0c3d36;
+  --color-result-text: #f7fbf9;
+  --color-result-muted: #c9e4db;
+  --color-focus: #0f6e62;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2.5rem;
+  --spacing-2xl: 4.5rem;
+  --radius-sm: 0.6rem;
+  --radius-md: 0.9rem;
+  --radius-lg: 1.35rem;
+  --shadow-sm: 0 1px 2px rgb(18 33 30 / 0.05), 0 8px 24px rgb(18 33 30 / 0.04);
+  --shadow-md: 0 18px 50px rgb(15 110 98 / 0.12);
+  --font-sans: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --content-width: 72rem;
+  --measure: 68ch;
+  --touch: 2.75rem;
+  --header-height: 4.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

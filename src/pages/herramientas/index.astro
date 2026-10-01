@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/navigation/Breadcrumbs.astro";
+import SearchBox from "../../components/navigation/SearchBox.astro";
+import { getCategory } from "../../config/categories";
+import { getActiveTools, getToolPath } from "../../config/tools";
+import { matchesSearch } from "../../domain/common/search";
+
+const query = Astro.url.searchParams.get("q")?.trim() ?? "";
+const tools = getActiveTools().filter((tool) =>
+  matchesSearch(query, [
+    tool.name,
+    tool.shortDescription,
+    getCategory(tool.category).name,
+    ...tool.keywords,
+  ]),
+);
+const crumbs = [
+  { name: "Inicio", href: "/" },
+  { name: "Herramientas", href: "/herramientas" },
+];
+---
+
+<BaseLayout
+  title="Herramientas"
+  description="Listado de calculadoras gratuitas para trabajo, dinero, vehículos y vida cotidiana en Colombia."
+  breadcrumbs={crumbs}
+  robots={query.length > 0 ? "noindex" : undefined}
+>
+  <div class="shell">
+    <Breadcrumbs items={crumbs} />
+    <h1>Herramientas</h1>
+    <p class="lede">
+      Elige una calculadora. Si buscas, el resultado de la búsqueda no se indexa
+      como otra página.
+    </p>
+    <SearchBox query={query} />
+    {query.length > 0 && (
+      <p>
+        Resultados para “{query}”: {tools.length}
+      </p>
+    )}
+    <div class="card-grid section">
+      {tools.map((tool) => (
+        <a class="tool-card" href={getToolPath(tool.slug)}>
+          <p class="eyebrow">{getCategory(tool.category).name}</p>
+          <h2>{tool.name}</h2>
+          <p>{tool.shortDescription}</p>
+        </a>
+      ))}
+    </div>
+    {tools.length === 0 && (
+      <p>
+        No hay una herramienta con esas palabras. Prueba con salario, prima,
+        gasolina o crédito.
+      </p>
+    )}
+  </div>
+</BaseLayout>

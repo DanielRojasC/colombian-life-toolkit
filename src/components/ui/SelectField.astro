@@ -1,0 +1,37 @@
+---
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  hint?: string;
+  options: Option[];
+  value?: string;
+}
+
+const { id, name, label, hint, options, value } = Astro.props;
+const describedBy = [hint ? `${id}-hint` : "", `${id}-error`]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class="field">
+  <label for={id}>{label}</label>
+  <select id={id} name={name} aria-describedby={describedBy}>
+    {options.map((option) => (
+      <option value={option.value} selected={option.value === value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+  {hint && (
+    <p id={`${id}-hint`} class="field-hint">
+      {hint}
+    </p>
+  )}
+  <p id={`${id}-error`} class="field-error" data-error-for={name} hidden></p>
+</div>
