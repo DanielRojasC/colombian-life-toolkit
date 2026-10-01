@@ -4,6 +4,7 @@ import { siteConfig } from "../config/site";
 import { createSeoMetadata } from "../utils/seo";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import SiteFooter from "../components/layout/SiteFooter.astro";
+import { adsense } from "../config/ads";
 
 interface Crumb {
   name: string;
@@ -86,6 +87,16 @@ const graph = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#0f6e62" />
+    {
+      adsense.enabled && (
+        <script
+          is:inline
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsense.client}`}
+          crossorigin="anonymous"
+        />
+      )
+    }
     {robots && <meta name="robots" content={robots} />}
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={seo.ogLocale} />

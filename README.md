@@ -75,7 +75,7 @@ El build de `dist/` se puede publicar en Cloudflare Pages, Netlify, Vercel u otr
 | ---------- | ---------------------------------------------------- |
 | `SITE_URL` | Origen público en tiempo de build. No es un secreto. |
 
-No hay variables `PUBLIC_` con llaves. La analítica no llama a un tercero. Los espacios de anuncio están apagados en `src/config/ads.ts`.
+No hay variables `PUBLIC_` con llaves. La analítica no llama a un tercero. El script de AdSense vive en `src/config/ads.ts`. Los espacios manuales siguen apagados hasta tener un id de bloque.
 
 ## Decisiones
 
